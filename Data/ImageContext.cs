@@ -1,15 +1,15 @@
 ﻿using _1.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace _1.Data
+namespace _1.Models
 {
-    public class ImageContext: DbContext
+    public class ImageContext : DbContext
     {
-        public ImageContext(DbContextOptions<ImageContext> options) : base(options) { }
-        public DbSet<ImageModel> ImageModels{ get; set; }
+        public DbSet<ImageModel> Images { get; set; }
+        public ImageContext(DbContextOptions<ImageContext> options)
+            : base(options)
+        {
+            Database.EnsureCreated();
+        }
     }
 }

@@ -9,16 +9,21 @@ using _1.Data;
 using _1.Models;
 using System.IO;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 
 namespace _1.Controllers
 {
     public class PostModelsController : Controller
     {
         private readonly PostContext _context;
+        ImageContext _ImContext;
+        IWebHostEnvironment _appEnvironment;
 
-        public PostModelsController(PostContext context)
+        public PostModelsController(PostContext context, IWebHostEnvironment appEnvironment, ImageContext ImContext)
         {
             _context = context;
+            _appEnvironment = appEnvironment;
+            _ImContext = ImContext;
         }
 
         // GET: PostModels
@@ -176,6 +181,55 @@ namespace _1.Controllers
         private bool PostModelExists(int id)
         {
             return _context.PostModels.Any(e => e.Id == id);
+        }
+
+
+        //      Изображения
+        [HttpPost]
+        public async Task<IActionResult> AddImage(IFormFile uploadedFile)
+        {
+            if (uploadedFile != null)
+            {
+                string path = "/Images/" + uploadedFile.FileName;
+                using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
+                {
+                    await uploadedFile.CopyToAsync(fileStream);
+                }
+                ImageModel file = new ImageModel { Name = uploadedFile.FileName, Path = path };
+                _ImContext.Images.Add(file);
+                _ImContext.SaveChanges();
+            }
+
+            return RedirectToAction("Images");
+        }
+        public IActionResult Images()
+        {
+            return View(_ImContext.Images.ToList());
+        }
+        public async Task<IActionResult> DeleteImage(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var imageModel = await _ImContext.Images
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (imageModel == null)
+            {
+                return NotFound();
+            }
+
+            return View(imageModel);
+        }
+        [HttpPost, ActionName("DeleteImage")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteIm(int id)
+        {
+            var imageModel = await _ImContext.Images.FindAsync(id);
+            _ImContext.Images.Remove(imageModel);
+            await _ImContext.SaveChangesAsync();
+            return RedirectToAction(nameof(Images));
         }
     }
 }

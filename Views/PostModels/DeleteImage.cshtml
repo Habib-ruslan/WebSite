@@ -1,0 +1,16 @@
+﻿@model _1.Models.ImageModel
+
+@{
+    ViewData["Title"] = "Удаление";
+}
+
+<h1>Удалить изображение?</h1>
+
+<div>
+    <img src="@Url.Content(Model.Path)" />
+    <form asp-action="DeleteImage">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Назад</a>
+    </form>
+</div>

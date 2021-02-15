@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using _1.Data;
 using Microsoft.EntityFrameworkCore;
+using _1.Models;
 
 namespace _1
 {
