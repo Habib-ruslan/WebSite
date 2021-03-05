@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using _1.Data;
 
 namespace _1.Migrations
 {
     [DbContext(typeof(PostContext))]
-    partial class PostContextModelSnapshot : ModelSnapshot
+    [Migration("20210302124750_Initial5")]
+    partial class Initial5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -62,11 +64,9 @@ namespace _1.Migrations
 
             modelBuilder.Entity("_1.Models.ImageModel", b =>
                 {
-                    b.HasOne("_1.Models.PostModel", "PostModel")
+                    b.HasOne("_1.Models.PostModel", null)
                         .WithMany("Images")
                         .HasForeignKey("PostModelId");
-
-                    b.Navigation("PostModel");
                 });
 
             modelBuilder.Entity("_1.Models.PostModel", b =>

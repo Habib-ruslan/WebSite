@@ -10,5 +10,8 @@ namespace _1.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Path { get; set; }
+        public PostModel PostModel { get; set; }
+
+        public int PostModelId { get; set; }
     }
 }

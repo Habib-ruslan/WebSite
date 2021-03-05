@@ -2,12 +2,6 @@
 @{
     ViewData["Title"] = "Изображения";
 }
-<h3>Выберите файл для загрузки</h3>
-<form asp-action="AddImage" asp-controller="PostModels" method="post" enctype="multipart/form-data">
-    <input type="file" name="uploadedFile" /><br>
-    <input type="submit" value="Загрузить" />
-</form>
-
 <h2>Все файлы</h2>
 @foreach (var f in Model)
 {

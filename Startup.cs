@@ -28,7 +28,7 @@ namespace _1
         {
             services.AddControllersWithViews();
             services.AddDbContext<PostContext>(options => options.UseSqlServer(Configuration.GetConnectionString("PostContext")));
-            services.AddDbContext<ImageContext>(options => options.UseSqlServer(Configuration.GetConnectionString("ImageContext")));
+            //services.AddDbContext<ImageContext>(options => options.UseSqlServer(Configuration.GetConnectionString("ImageContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

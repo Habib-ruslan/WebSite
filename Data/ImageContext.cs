@@ -1,6 +1,6 @@
 ﻿using _1.Models;
 using Microsoft.EntityFrameworkCore;
-
+/*
 namespace _1.Models
 {
     public class ImageContext : DbContext
@@ -12,4 +12,4 @@ namespace _1.Models
             Database.EnsureCreated();
         }
     }
-}
+}*/

@@ -12,5 +12,11 @@ namespace _1.Models
         public string Name { get; set; }
         public string Text { get; set; }
 
+        public List<ImageModel> Images { get; set; }
+        public PostModel()
+        {
+            Images = new List<ImageModel>();
+        }
+
     }
 }

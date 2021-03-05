@@ -1,4 +1,5 @@
 ﻿@model _1.Models.PostModel
+@using _1.Models;
 
 @{
     ViewData["Title"] = "Edit";
@@ -6,11 +7,10 @@
 
 <h1>Edit</h1>
 
-<h4>PostModel</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form class="form" asp-action="Edit" asp-controller="PostModels" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -23,17 +23,26 @@
                 <input asp-for="Text" class="form-control" />
                 <span asp-validation-for="Text" class="text-danger"></span>
             </div>
+            <div>
+                <input type="file" name="uploadedFile" /><br>
+                <input type="file" name="uploadedFile" /><br>
+                <input type="file" name="uploadedFile" /><br>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
+@foreach (ImageModel I in Model.Images)
+{
+    <p><img src="@Url.Content(I.Path)"></p>
+    <a asp-action="DeleteImage" asp-route-id="@I.Id">Удалить</a>
+}
 
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

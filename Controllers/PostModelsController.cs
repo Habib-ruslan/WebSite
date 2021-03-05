@@ -16,20 +16,20 @@ namespace _1.Controllers
     public class PostModelsController : Controller
     {
         private readonly PostContext _context;
-        ImageContext _ImContext;
+        //ImageContext _ImContext;
         IWebHostEnvironment _appEnvironment;
 
-        public PostModelsController(PostContext context, IWebHostEnvironment appEnvironment, ImageContext ImContext)
+        public PostModelsController(PostContext context, IWebHostEnvironment appEnvironment/*ImageContext ImContext*/)
         {
             _context = context;
             _appEnvironment = appEnvironment;
-            _ImContext = ImContext;
+            //_ImContext = ImContext;
         }
 
         // GET: PostModels
         public async Task<IActionResult> Index()
         {
-            return View(await _context.PostModels.ToListAsync());
+            return View(await _context.PostModels.Include(f=> f.Images).ToListAsync());
         }
 
         // GET: PostModels/Details/5
@@ -40,7 +40,7 @@ namespace _1.Controllers
                 return NotFound();
             }
 
-            var postModel = await _context.PostModels
+            var postModel = await _context.PostModels.Include(f=> f.Images)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (postModel == null)
             {
@@ -87,12 +87,13 @@ namespace _1.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Text")] PostModel postModel)
+        public async Task<IActionResult> Create([Bind("Id,Name,Text,Images")] PostModel postModel)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(postModel);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             return View(postModel);
@@ -105,8 +106,8 @@ namespace _1.Controllers
             {
                 return NotFound();
             }
-
-            var postModel = await _context.PostModels.FindAsync(id);
+            var postModel = await _context.PostModels.Include(f => f.Images)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (postModel == null)
             {
                 return NotFound();
@@ -119,17 +120,31 @@ namespace _1.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Text")] PostModel postModel)
+        public async Task<IActionResult> Edit(int id, PostModel postModel, IFormFile[] UploadedFile)
         {
             if (id != postModel.Id)
             {
                 return NotFound();
             }
-
             if (ModelState.IsValid)
             {
                 try
                 {
+                    foreach (IFormFile uploadedFile in UploadedFile)
+                    {
+                        if (uploadedFile != null)
+                        {
+                            string path = "/Images/" + uploadedFile.FileName;
+                            using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
+                            {
+                                await uploadedFile.CopyToAsync(fileStream);
+                            }
+                            ImageModel file = new ImageModel { Name = uploadedFile.FileName, Path = path, PostModelId = id };
+                            _context.Images.Add(file);
+                        }
+                        _context.Update(postModel);
+                        await _context.SaveChangesAsync();
+                    }
                     _context.Update(postModel);
                     await _context.SaveChangesAsync();
                 }
@@ -148,6 +163,7 @@ namespace _1.Controllers
             }
             return View(postModel);
         }
+
 
         // GET: PostModels/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -183,53 +199,16 @@ namespace _1.Controllers
             return _context.PostModels.Any(e => e.Id == id);
         }
 
-
+        
         //      Изображения
-        [HttpPost]
-        public async Task<IActionResult> AddImage(IFormFile uploadedFile)
-        {
-            if (uploadedFile != null)
-            {
-                string path = "/Images/" + uploadedFile.FileName;
-                using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
-                {
-                    await uploadedFile.CopyToAsync(fileStream);
-                }
-                ImageModel file = new ImageModel { Name = uploadedFile.FileName, Path = path };
-                _ImContext.Images.Add(file);
-                _ImContext.SaveChanges();
-            }
-
-            return RedirectToAction("Images");
-        }
-        public IActionResult Images()
-        {
-            return View(_ImContext.Images.ToList());
-        }
-        public async Task<IActionResult> DeleteImage(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var imageModel = await _ImContext.Images
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (imageModel == null)
-            {
-                return NotFound();
-            }
-
-            return View(imageModel);
-        }
         [HttpPost, ActionName("DeleteImage")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteIm(int id)
         {
-            var imageModel = await _ImContext.Images.FindAsync(id);
-            _ImContext.Images.Remove(imageModel);
-            await _ImContext.SaveChangesAsync();
-            return RedirectToAction(nameof(Images));
+            var imageModel = await _context.Images.FindAsync(id);
+            _context.Images.Remove(imageModel);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }
